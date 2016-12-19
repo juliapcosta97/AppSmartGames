@@ -1,13 +1,11 @@
 package br.com.smartgames.app;
 
-import android.app.Activity;
-import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Parcelable;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -19,9 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.AdapterView;
-import android.widget.ImageView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 
@@ -30,7 +26,6 @@ import java.util.ArrayList;
 import helper.HttpRequest;
 import helper.HttpRequestFabric;
 import helper.ProdutoAdapter;
-import helper.Sessao;
 import models.Produto;
 
 
@@ -40,7 +35,7 @@ public class MainActivity extends AppCompatActivity
     ProdutoAdapter produtoAdapter;
     ListView lstProdutos;
     Produto[] produtos;
-
+    Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,6 +49,8 @@ public class MainActivity extends AppCompatActivity
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
+
+        context = this;
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
@@ -140,6 +137,14 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            SharedPreferences prefs = getSharedPreferences("meu_arquivo_de_preferencias", 0);
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("estaLogado", false);
+
+            editor.clear();
+            editor.commit();
+
             Intent login = new Intent(getApplicationContext(), LoginActivity.class);
             startActivity(login);
         }
@@ -153,17 +158,13 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
+        if (id == R.id.item_acao) {
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.item_rpg) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.item_esportes) {
 
-        } else if (id == R.id.nav_manage) {
-
-        } else if (id == R.id.nav_share) {
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.item_luta) {
 
         }
 

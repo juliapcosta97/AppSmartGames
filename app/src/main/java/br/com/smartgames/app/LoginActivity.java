@@ -3,9 +3,9 @@ package br.com.smartgames.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -41,15 +41,11 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-import helper.Conexao;
 import helper.HttpRequest;
 import helper.HttpRequestFabric;
-import helper.Sessao;
 import models.LoginUsuario;
-import models.Produto;
 
 import static android.Manifest.permission.READ_CONTACTS;
-import static java.security.AccessController.getContext;
 
 /**
  * A login screen that offers login via email/password.
@@ -90,7 +86,13 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
         setContentView(R.layout.activity_login);
         // Set up the login form.
 
+        SharedPreferences prefs = getSharedPreferences("meu_arquivo_de_preferencias", 0);
+        boolean  jaLogou = prefs.getBoolean("estaLogado", false);
 
+        if(jaLogou) {
+            Intent home = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(home);
+        }
 
         mEmailView = (AutoCompleteTextView) findViewById(R.id.email);
         populateAutoComplete();
@@ -130,6 +132,12 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
                     } else {
 
                         new SolicitaDados().execute();
+
+                        SharedPreferences prefs = getSharedPreferences("meu_arquivo_de_preferencias", 0);
+                        SharedPreferences.Editor editor = prefs.edit();
+                        editor.putBoolean("estaLogado", true);
+
+                        editor.commit();
                     }
                 } else {
                     Toast.makeText(getApplicationContext(), "Nehuma conexãoo detectada", Toast.LENGTH_SHORT).show();
