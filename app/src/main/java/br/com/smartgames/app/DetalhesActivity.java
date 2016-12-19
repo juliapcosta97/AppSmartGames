@@ -58,7 +58,7 @@ public class DetalhesActivity extends AppCompatActivity {
             txtDesenvolvedor.setText("Desenvolvedor: " + p.getDesenvolvedor());
             //txtLoja.setText(p.getLoja());*/
 
-            String imagemProduto = context.getString(R.string.link) + "/AppSmartGames/" + p.getImagem();
+            String imagemProduto = context.getString(R.string.link) + "/ProjetoSmartGames/" + p.getImagem();
             Log.d("imgDetalhe", imagemProduto);
 
            Picasso.with(context).load(imagemProduto).into(img_detalhes);

@@ -7,6 +7,7 @@ package models;
 public class LoginUsuario {
     private int codUsuario;
     private String usuario;
+    private String senha;
 
     public int getCodUsuario() {
         return codUsuario;
@@ -24,4 +25,11 @@ public class LoginUsuario {
         this.usuario = usuario;
     }
 
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
 }

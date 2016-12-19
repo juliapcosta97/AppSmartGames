@@ -3,8 +3,12 @@ package br.com.smartgames.app;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
@@ -20,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.text.TextUtils;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -31,10 +36,20 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import helper.Conexao;
+import helper.HttpRequest;
+import helper.HttpRequestFabric;
+import helper.Sessao;
+import models.LoginUsuario;
+import models.Produto;
+
 import static android.Manifest.permission.READ_CONTACTS;
+import static java.security.AccessController.getContext;
 
 /**
  * A login screen that offers login via email/password.
@@ -63,6 +78,10 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
     private EditText mPasswordView;
     private View mProgressView;
     private View mLoginFormView;
+    String url = "";
+    String parametros = "";
+    String usuario;
+    String senha;
 
 
     @Override
@@ -94,25 +113,70 @@ public class LoginActivity extends AppCompatActivity implements LoaderCallbacks<
             public void onClick(View view) {
                 //attemptLogin();
 
-                String usuario = mEmailView.getText().toString();
-                String senha = mPasswordView.getText().toString();
+                mLoginFormView = findViewById(R.id.login_form);
+                mProgressView = findViewById(R.id.login_progress);
 
+                ConnectivityManager connMgr = (ConnectivityManager)
+                        getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+                NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-                if (usuario.isEmpty() || senha.isEmpty()) {
-                    Toast.makeText(getApplicationContext(), "Preencha todos os campos", Toast.LENGTH_SHORT).show();
-                }else{
+                if (networkInfo != null && networkInfo.isConnected()) {
 
-                    Intent home = new Intent(getApplicationContext(), MainActivity.class);
-                    startActivity(home);
+                     usuario = mEmailView.getText().toString();
+                     senha = mPasswordView.getText().toString();
 
+                    if (usuario.isEmpty() || senha.isEmpty()) {
+                        Toast.makeText(getApplicationContext(), "Preencha todos os campos", Toast.LENGTH_SHORT).show();
+                    } else {
+
+                        new SolicitaDados().execute();
+                    }
+                } else {
+                    Toast.makeText(getApplicationContext(), "Nehuma conexãoo detectada", Toast.LENGTH_SHORT).show();
                 }
             }
-        });
 
-        mLoginFormView = findViewById(R.id.login_form);
-        mProgressView = findViewById(R.id.login_progress);
+        });
     }
 
+
+    private class SolicitaDados extends AsyncTask<String, Void, String> {
+        @Override
+        protected String doInBackground(String... params) {
+
+            String link = "http://192.168.0.11/API/verifica_usuario.php?usuario=" + usuario + "&senha=" + senha;
+
+            Log.i("link ", link);
+
+            boolean acessarInternet = true;
+
+            HttpRequest http = HttpRequestFabric.getHttpRequest(acessarInternet);
+
+            String json = http.getJson(link);
+
+            return json;
+
+        }
+
+
+        @Override
+        protected void onPostExecute(String resultado) {
+            super.onPostExecute(resultado);
+
+
+            Log.i("login", resultado);
+
+            LoginUsuario login = new Gson().fromJson(resultado, LoginUsuario.class);
+
+            if (login != null) {
+                    Intent home = new Intent(getApplicationContext(), MainActivity.class);
+                    startActivity(home);
+            }else{
+                Toast.makeText(getApplicationContext(), "Usuario ou Senha incorreto", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+    }
     private void populateAutoComplete() {
         if (!mayRequestContacts()) {
             return;

@@ -58,7 +58,7 @@ public class ProdutoAdapter extends ArrayAdapter<Produto>{
 
         txtGenero.setText(p.getGenero());
 
-        String imagemProduto = context.getString(R.string.link) + "/AppSmartGames/" + p.getImagem();
+        String imagemProduto = context.getString(R.string.link) + "/ProjetoSmartGames/" + p.getImagem();
         Log.d("imagem", imagemProduto);
 
         Picasso.with(getContext()).load(imagemProduto).into(imgProduto);
